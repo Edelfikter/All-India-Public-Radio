@@ -21,20 +21,28 @@ router.post('/register', async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, 10);
     
-    const stmt = db.prepare('INSERT INTO users (username, password_hash) VALUES (?, ?)');
-    const result = stmt.run(username, passwordHash);
-    
-    const token = jwt.sign(
-      { userId: result.lastInsertRowid, username },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+    db.run(
+      'INSERT INTO users (username, password_hash) VALUES (?, ?)',
+      [username, passwordHash],
+      function(err) {
+        if (err) {
+          if (err.message.includes('UNIQUE constraint failed')) {
+            return res.status(400).json({ error: 'Username already exists' });
+          }
+          console.error('Register error:', err);
+          return res.status(500).json({ error: 'Server error' });
+        }
+        
+        const token = jwt.sign(
+          { userId: this.lastID, username },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        );
+        
+        res.json({ token, userId: this.lastID, username });
+      }
     );
-    
-    res.json({ token, userId: result.lastInsertRowid, username });
   } catch (error) {
-    if (error.code === 'SQLITE_CONSTRAINT') {
-      return res.status(400).json({ error: 'Username already exists' });
-    }
     console.error('Register error:', error);
     res.status(500).json({ error: 'Server error' });
   }
@@ -49,26 +57,34 @@ router.post('/login', async (req, res) => {
       return res.status(400).json({ error: 'Username and password required' });
     }
 
-    const stmt = db.prepare('SELECT * FROM users WHERE username = ?');
-    const user = stmt.get(username);
-    
-    if (!user) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+    db.get(
+      'SELECT * FROM users WHERE username = ?',
+      [username],
+      async (err, user) => {
+        if (err) {
+          console.error('Login error:', err);
+          return res.status(500).json({ error: 'Server error' });
+        }
+        
+        if (!user) {
+          return res.status(401).json({ error: 'Invalid credentials' });
+        }
 
-    const validPassword = await bcrypt.compare(password, user.password_hash);
-    
-    if (!validPassword) {
-      return res.status(401).json({ error: 'Invalid credentials' });
-    }
+        const validPassword = await bcrypt.compare(password, user.password_hash);
+        
+        if (!validPassword) {
+          return res.status(401).json({ error: 'Invalid credentials' });
+        }
 
-    const token = jwt.sign(
-      { userId: user.id, username: user.username },
-      JWT_SECRET,
-      { expiresIn: '7d' }
+        const token = jwt.sign(
+          { userId: user.id, username: user.username },
+          JWT_SECRET,
+          { expiresIn: '7d' }
+        );
+        
+        res.json({ token, userId: user.id, username: user.username });
+      }
     );
-    
-    res.json({ token, userId: user.id, username: user.username });
   } catch (error) {
     console.error('Login error:', error);
     res.status(500).json({ error: 'Server error' });

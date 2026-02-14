@@ -32,10 +32,13 @@ router.get('/', (req, res) => {
 
     query += ' ORDER BY s.created_at DESC';
 
-    const stmt = db.prepare(query);
-    const stations = stmt.all(...params);
-    
-    res.json(stations);
+    db.all(query, params, (err, stations) => {
+      if (err) {
+        console.error('Get stations error:', err);
+        return res.status(500).json({ error: 'Server error' });
+      }
+      res.json(stations);
+    });
   } catch (error) {
     console.error('Get stations error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -45,19 +48,25 @@ router.get('/', (req, res) => {
 // Get single station
 router.get('/:id', (req, res) => {
   try {
-    const stmt = db.prepare(`
-      SELECT s.*, u.username as host
-      FROM stations s
-      JOIN users u ON s.user_id = u.id
-      WHERE s.id = ?
-    `);
-    const station = stmt.get(req.params.id);
-    
-    if (!station) {
-      return res.status(404).json({ error: 'Station not found' });
-    }
-    
-    res.json(station);
+    db.get(
+      `SELECT s.*, u.username as host
+       FROM stations s
+       JOIN users u ON s.user_id = u.id
+       WHERE s.id = ?`,
+      [req.params.id],
+      (err, station) => {
+        if (err) {
+          console.error('Get station error:', err);
+          return res.status(500).json({ error: 'Server error' });
+        }
+        
+        if (!station) {
+          return res.status(404).json({ error: 'Station not found' });
+        }
+        
+        res.json(station);
+      }
+    );
   } catch (error) {
     console.error('Get station error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -73,22 +82,33 @@ router.post('/', authMiddleware, (req, res) => {
       return res.status(400).json({ error: 'Name, lat, and lng are required' });
     }
 
-    const stmt = db.prepare(`
-      INSERT INTO stations (name, description, genre, lat, lng, user_id, loop_broadcast)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-    const result = stmt.run(
-      name,
-      description || '',
-      genre || '',
-      lat,
-      lng,
-      req.userId,
-      loop_broadcast !== undefined ? loop_broadcast : 1
+    db.run(
+      `INSERT INTO stations (name, description, genre, lat, lng, user_id, loop_broadcast)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
+      [
+        name,
+        description || '',
+        genre || '',
+        lat,
+        lng,
+        req.userId,
+        loop_broadcast !== undefined ? loop_broadcast : 1
+      ],
+      function(err) {
+        if (err) {
+          console.error('Create station error:', err);
+          return res.status(500).json({ error: 'Server error' });
+        }
+        
+        db.get('SELECT * FROM stations WHERE id = ?', [this.lastID], (err, station) => {
+          if (err) {
+            console.error('Get station error:', err);
+            return res.status(500).json({ error: 'Server error' });
+          }
+          res.json(station);
+        });
+      }
     );
-    
-    const station = db.prepare('SELECT * FROM stations WHERE id = ?').get(result.lastInsertRowid);
-    res.json(station);
   } catch (error) {
     console.error('Create station error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -100,31 +120,47 @@ router.put('/:id', authMiddleware, (req, res) => {
   try {
     const { name, description, genre, loop_broadcast } = req.body;
     
-    const station = db.prepare('SELECT * FROM stations WHERE id = ?').get(req.params.id);
-    
-    if (!station) {
-      return res.status(404).json({ error: 'Station not found' });
-    }
+    db.get('SELECT * FROM stations WHERE id = ?', [req.params.id], (err, station) => {
+      if (err) {
+        console.error('Get station error:', err);
+        return res.status(500).json({ error: 'Server error' });
+      }
+      
+      if (!station) {
+        return res.status(404).json({ error: 'Station not found' });
+      }
 
-    if (station.user_id !== req.userId) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
+      if (station.user_id !== req.userId) {
+        return res.status(403).json({ error: 'Not authorized' });
+      }
 
-    const stmt = db.prepare(`
-      UPDATE stations
-      SET name = ?, description = ?, genre = ?, loop_broadcast = ?
-      WHERE id = ?
-    `);
-    stmt.run(
-      name || station.name,
-      description !== undefined ? description : station.description,
-      genre !== undefined ? genre : station.genre,
-      loop_broadcast !== undefined ? loop_broadcast : station.loop_broadcast,
-      req.params.id
-    );
-    
-    const updated = db.prepare('SELECT * FROM stations WHERE id = ?').get(req.params.id);
-    res.json(updated);
+      db.run(
+        `UPDATE stations
+         SET name = ?, description = ?, genre = ?, loop_broadcast = ?
+         WHERE id = ?`,
+        [
+          name || station.name,
+          description !== undefined ? description : station.description,
+          genre !== undefined ? genre : station.genre,
+          loop_broadcast !== undefined ? loop_broadcast : station.loop_broadcast,
+          req.params.id
+        ],
+        (err) => {
+          if (err) {
+            console.error('Update station error:', err);
+            return res.status(500).json({ error: 'Server error' });
+          }
+          
+          db.get('SELECT * FROM stations WHERE id = ?', [req.params.id], (err, updated) => {
+            if (err) {
+              console.error('Get updated station error:', err);
+              return res.status(500).json({ error: 'Server error' });
+            }
+            res.json(updated);
+          });
+        }
+      );
+    });
   } catch (error) {
     console.error('Update station error:', error);
     res.status(500).json({ error: 'Server error' });
@@ -134,19 +170,28 @@ router.put('/:id', authMiddleware, (req, res) => {
 // Delete station (requires auth and ownership)
 router.delete('/:id', authMiddleware, (req, res) => {
   try {
-    const station = db.prepare('SELECT * FROM stations WHERE id = ?').get(req.params.id);
-    
-    if (!station) {
-      return res.status(404).json({ error: 'Station not found' });
-    }
+    db.get('SELECT * FROM stations WHERE id = ?', [req.params.id], (err, station) => {
+      if (err) {
+        console.error('Get station error:', err);
+        return res.status(500).json({ error: 'Server error' });
+      }
+      
+      if (!station) {
+        return res.status(404).json({ error: 'Station not found' });
+      }
 
-    if (station.user_id !== req.userId) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
+      if (station.user_id !== req.userId) {
+        return res.status(403).json({ error: 'Not authorized' });
+      }
 
-    db.prepare('DELETE FROM stations WHERE id = ?').run(req.params.id);
-    
-    res.json({ message: 'Station deleted' });
+      db.run('DELETE FROM stations WHERE id = ?', [req.params.id], (err) => {
+        if (err) {
+          console.error('Delete station error:', err);
+          return res.status(500).json({ error: 'Server error' });
+        }
+        res.json({ message: 'Station deleted' });
+      });
+    });
   } catch (error) {
     console.error('Delete station error:', error);
     res.status(500).json({ error: 'Server error' });
