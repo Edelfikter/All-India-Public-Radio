@@ -83,8 +83,12 @@ The homepage displays:
 
 1. **Register an account**
    - Click the "Register" button in the top right
+   
+   ![Register Modal](https://github.com/user-attachments/assets/eb1dde5e-bd28-4227-85bb-593beaba78f0)
+   
    - Choose a username and password (minimum 6 characters)
    - Click "Register"
+   - You'll be automatically logged in!
 
 2. **Create your first station**
    - Click "Create Station" button
