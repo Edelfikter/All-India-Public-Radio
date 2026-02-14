@@ -2,6 +2,44 @@
 
 **DIY Radio Platform** - Create virtual radio stations pinned on a map of India. Build broadcasts with YouTube music, browser-native TTS callouts, volume control, and fades.
 
+---
+
+## ⚡ How to Open This
+
+**Quick Start (3 steps):**
+
+```bash
+# 1. Install dependencies (first time only)
+npm install
+
+# 2. Start the server
+npm start
+
+# 3. Open in your browser
+# Go to: http://localhost:3000
+```
+
+**What You'll See:**
+
+![All India Public Radio Homepage](https://github.com/user-attachments/assets/36f0f26d-b7b4-4d47-9a26-93f092662c88)
+
+The application opens with a map of India where you can create and browse radio stations!
+
+**First Time Setup:**
+- Make sure you have [Node.js](https://nodejs.org/) installed (version 14 or higher)
+- Run `npm install` once to download dependencies (takes 1-2 minutes)
+- Then use `npm start` anytime to run the application
+- Open `http://localhost:3000` in any modern web browser
+
+**Common Issues:**
+- **Port already in use?** Kill the process on port 3000 or set a different port: `PORT=3001 npm start`
+- **npm not found?** Install [Node.js](https://nodejs.org/) first
+- **Dependencies fail?** Try `npm install --legacy-peer-deps`
+
+📖 **New to this project?** Check out [QUICKSTART.md](QUICKSTART.md) for a detailed step-by-step guide with troubleshooting tips!
+
+---
+
 ## 🌟 Features
 
 - **Interactive Map**: Place radio stations anywhere in India using Leaflet.js
