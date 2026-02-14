@@ -172,7 +172,7 @@ async function addVolumeDip() {
   const duration = parseFloat(document.getElementById('dipDuration').value);
   const errorEl = document.getElementById('addDipError');
 
-  if (volume === undefined || duration === undefined) {
+  if (isNaN(volume) || isNaN(duration)) {
     errorEl.textContent = 'Volume and duration are required';
     return;
   }

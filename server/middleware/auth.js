@@ -2,6 +2,10 @@ const jwt = require('jsonwebtoken');
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 
+if (!process.env.JWT_SECRET) {
+  console.warn('WARNING: Using default JWT_SECRET. Set JWT_SECRET environment variable in production!');
+}
+
 function authMiddleware(req, res, next) {
   const token = req.headers.authorization?.split(' ')[1];
   

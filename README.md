@@ -22,7 +22,7 @@
 - **Music**: YouTube IFrame Player API
 - **TTS**: Browser `window.speechSynthesis` API
 - **Backend**: Node.js + Express
-- **Database**: SQLite (via better-sqlite3)
+- **Database**: SQLite (via sqlite3)
 - **Auth**: bcrypt + JWT
 
 ### Key Design Principles
