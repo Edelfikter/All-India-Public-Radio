@@ -230,6 +230,16 @@ pm2 save
 pm2 startup
 ```
 
+### Security Recommendations
+
+For production deployment, consider implementing:
+
+- **Rate Limiting**: Add rate limiting middleware (e.g., `express-rate-limit`) to prevent abuse
+- **HTTPS**: Use HTTPS for all connections (required for Web Speech API)
+- **CORS Configuration**: Restrict CORS to specific domains
+- **Input Validation**: Additional input validation and sanitization
+- **Database Backups**: Regular automated backups of `radio.db`
+
 ## 📱 Browser Compatibility
 
 - Chrome/Edge: Full support

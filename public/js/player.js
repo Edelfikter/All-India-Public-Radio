@@ -112,8 +112,20 @@ async function playTrack(segment) {
   // Extract video ID from URL if needed
   let videoId = config.youtubeId;
   if (videoId.includes('youtube.com') || videoId.includes('youtu.be')) {
-    const match = videoId.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\s]+)/);
-    if (match) videoId = match[1];
+    // Match YouTube video ID patterns
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=)([^&\s]+)/,
+      /(?:youtu\.be\/)([^&\s?]+)/,
+      /(?:youtube\.com\/embed\/)([^&\s?]+)/
+    ];
+    
+    for (const pattern of patterns) {
+      const match = videoId.match(pattern);
+      if (match) {
+        videoId = match[1];
+        break;
+      }
+    }
   }
 
   document.getElementById('nowPlayingInfo').innerHTML = `
