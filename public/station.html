@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Station - All India Public Radio</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <div class="station-container">
+    <!-- Sidebar -->
+    <div class="station-sidebar" id="stationSidebar">
+      <h2>Broadcast Timeline</h2>
+      <div id="builderControls" style="display: none;">
+        <button onclick="showAddTrackForm()">Add Track</button>
+        <button class="secondary" onclick="showAddTTSForm()">Add TTS</button>
+        <button class="secondary" onclick="showAddDipForm()">Add Volume Dip</button>
+        <hr style="margin: 15px 0; border-color: #333;">
+      </div>
+      <div id="segmentList"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="station-main">
+      <!-- Station Header -->
+      <div class="station-header">
+        <button class="secondary" onclick="window.location.href='/'">← Back to Map</button>
+        <h1 id="stationName"></h1>
+        <p class="station-info" id="stationHost"></p>
+        <p class="station-info" id="stationDescription"></p>
+        <p class="station-info" id="stationGenre"></p>
+        <div style="margin-top: 10px;">
+          <button id="playBtn" onclick="startPlayback()" style="display: none;">▶ Play Station</button>
+          <button id="stopBtn" onclick="stopPlayback()" style="display: none;">⏹ Stop</button>
+          <button id="editBtn" onclick="enableEditMode()" style="display: none;">✏️ Edit Broadcast</button>
+        </div>
+      </div>
+
+      <!-- Player Container -->
+      <div class="player-container">
+        <div id="player"></div>
+        <div class="now-playing" id="nowPlaying" style="display: none;">
+          <h3>Now Playing</h3>
+          <div class="now-playing-info" id="nowPlayingInfo"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Track Modal -->
+  <div class="modal" id="addTrackModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('addTrackModal')">&times;</button>
+      <h2>Add YouTube Track</h2>
+      <label>YouTube URL or Video ID *</label>
+      <input type="text" id="trackYoutubeId" placeholder="https://www.youtube.com/watch?v=... or video ID">
+      <label>Track Title (optional)</label>
+      <input type="text" id="trackTitle" placeholder="Song name">
+      <label>Start Time (seconds)</label>
+      <input type="number" id="trackStartTime" value="0" min="0">
+      <label>End Time (seconds, 0 = full track)</label>
+      <input type="number" id="trackEndTime" value="0" min="0">
+      <label>Fade In Duration (seconds)</label>
+      <input type="number" id="trackFadeIn" value="0" min="0" step="0.5">
+      <label>Fade Out Duration (seconds)</label>
+      <input type="number" id="trackFadeOut" value="2" min="0" step="0.5">
+      <div class="error-message" id="addTrackError"></div>
+      <div class="modal-buttons">
+        <button onclick="addTrack()">Add Track</button>
+        <button class="secondary" onclick="closeModal('addTrackModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add TTS Modal -->
+  <div class="modal" id="addTTSModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('addTTSModal')">&times;</button>
+      <h2>Add TTS Announcement</h2>
+      <label>Text to Speak *</label>
+      <textarea id="ttsText" rows="4" placeholder="Welcome to my radio station..."></textarea>
+      <label>Voice</label>
+      <select id="ttsVoice"></select>
+      <label>
+        <input type="checkbox" id="ttsDipMusic" checked>
+        Dip music volume during announcement
+      </label>
+      <label>Music Volume During TTS (%)</label>
+      <input type="number" id="ttsDipVolume" value="20" min="0" max="100">
+      <div class="error-message" id="addTTSError"></div>
+      <div class="modal-buttons">
+        <button onclick="addTTS()">Add TTS</button>
+        <button class="secondary" onclick="closeModal('addTTSModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Volume Dip Modal -->
+  <div class="modal" id="addDipModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('addDipModal')">&times;</button>
+      <h2>Add Volume Dip</h2>
+      <label>Volume Level (%) *</label>
+      <input type="number" id="dipVolume" value="30" min="0" max="100">
+      <label>Duration (seconds) *</label>
+      <input type="number" id="dipDuration" value="5" min="1" step="0.5">
+      <div class="error-message" id="addDipError"></div>
+      <div class="modal-buttons">
+        <button onclick="addVolumeDip()">Add Volume Dip</button>
+        <button class="secondary" onclick="closeModal('addDipModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.youtube.com/iframe_api"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/player.js"></script>
+  <script src="/js/builder.js"></script>
+</body>
+</html>
