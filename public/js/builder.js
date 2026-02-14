@@ -1,6 +1,12 @@
 let editMode = false;
 let availableVoices = [];
 
+// Utility function to truncate text with ellipsis
+function truncateText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  return text.substring(0, maxLength) + '...';
+}
+
 // Load available TTS voices
 function loadVoices() {
   if (!window.speechSynthesis) return;
@@ -51,7 +57,7 @@ function updateSegmentUIWithEdit() {
         details = `${config.fadeIn}s fade-in, ${config.fadeOut}s fade-out`;
         break;
       case 'tts':
-        title = config.text.substring(0, 50) + (config.text.length > 50 ? '...' : '');
+        title = truncateText(config.text, 50);
         details = config.dipMusic ? `Music dip to ${config.dipVolume}%` : 'No music dip';
         break;
       case 'volume_dip':

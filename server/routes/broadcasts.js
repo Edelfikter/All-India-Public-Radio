@@ -217,13 +217,12 @@ router.delete('/:stationId/:segmentId', authMiddleware, (req, res) => {
 // Reorder segments (requires auth and station ownership)
 router.post('/:stationId/reorder', authMiddleware, (req, res) => {
   try {
-    const { segmentIds } = req.body; // Array of segment IDs in new order
+    const { segmentIds } = req.body;
     
     if (!segmentIds || segmentIds.length === 0) {
       return res.json({ message: 'No segments to reorder' });
     }
     
-    // Check station ownership
     db.get('SELECT * FROM stations WHERE id = ?', [req.params.stationId], (err, station) => {
       if (err) {
         console.error('Get station error:', err);
@@ -237,31 +236,46 @@ router.post('/:stationId/reorder', authMiddleware, (req, res) => {
         return res.status(403).json({ error: 'Not authorized' });
       }
 
-      // Use serialize to ensure sequential execution
       db.serialize(() => {
-        db.run('BEGIN TRANSACTION');
-        
-        let errorOccurred = false;
-        let completed = 0;
-        
-        segmentIds.forEach((segmentId, index) => {
-          db.run('UPDATE segments SET position = ? WHERE id = ?', [index, segmentId], (err) => {
-            if (err && !errorOccurred) {
-              errorOccurred = true;
-              console.error('Reorder segments error:', err);
-              db.run('ROLLBACK');
-              return res.status(500).json({ error: 'Server error' });
-            }
-            completed++;
-            if (completed === segmentIds.length && !errorOccurred) {
-              db.run('COMMIT', (err) => {
-                if (err) {
-                  console.error('Commit error:', err);
-                  return res.status(500).json({ error: 'Server error' });
-                }
-                res.json({ message: 'Segments reordered' });
-              });
-            }
+        db.run('BEGIN TRANSACTION', (err) => {
+          if (err) {
+            console.error('Begin transaction error:', err);
+            return res.status(500).json({ error: 'Server error' });
+          }
+
+          let errorOccurred = false;
+          let completed = 0;
+          
+          segmentIds.forEach((segmentId, index) => {
+            db.run('UPDATE segments SET position = ? WHERE id = ?', [index, segmentId], (err) => {
+              if (err && !errorOccurred) {
+                errorOccurred = true;
+                console.error('Reorder segments error:', err);
+                db.run('ROLLBACK', (rollbackErr) => {
+                  if (rollbackErr) {
+                    console.error('Rollback error:', rollbackErr);
+                  }
+                  res.status(500).json({ error: 'Server error' });
+                });
+                return;
+              }
+              completed++;
+              if (completed === segmentIds.length && !errorOccurred) {
+                db.run('COMMIT', (err) => {
+                  if (err) {
+                    console.error('Commit error:', err);
+                    db.run('ROLLBACK', (rollbackErr) => {
+                      if (rollbackErr) {
+                        console.error('Rollback error:', rollbackErr);
+                      }
+                      res.status(500).json({ error: 'Server error' });
+                    });
+                    return;
+                  }
+                  res.json({ message: 'Segments reordered' });
+                });
+              }
+            });
           });
         });
       });

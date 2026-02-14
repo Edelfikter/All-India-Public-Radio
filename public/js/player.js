@@ -180,7 +180,7 @@ async function playTTS(segment) {
   
   document.getElementById('nowPlayingInfo').innerHTML = `
     <strong>📢 Announcement</strong><br>
-    ${config.text.substring(0, 100)}...
+    ${config.text.length > 100 ? config.text.substring(0, 100) + '...' : config.text}
   `;
 
   // Dip music if needed
