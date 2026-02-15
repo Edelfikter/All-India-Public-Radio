@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>All India Public Radio - DIY Radio Platform</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <h1>🎙️ All India Public Radio</h1>
+    <div class="header-buttons">
+      <span class="user-info" id="userInfo"></span>
+      <button id="loginBtn" onclick="showLoginModal()">Login</button>
+      <button id="registerBtn" class="secondary" onclick="showRegisterModal()">Register</button>
+      <button id="logoutBtn" style="display: none;" onclick="logout()">Logout</button>
+      <button id="createStationBtn" style="display: none;" class="secondary" onclick="enableStationCreation()">Create Station</button>
+      <button id="toggleListBtn" onclick="toggleStationList()">Station List</button>
+    </div>
+  </div>
+
+  <!-- Map -->
+  <div id="map"></div>
+
+  <!-- Station List Sidebar -->
+  <div class="station-list" id="stationList" style="display: none;">
+    <h2>All Stations</h2>
+    <div class="search-bar">
+      <input type="text" id="searchInput" placeholder="Search stations..." onkeyup="searchStations()">
+    </div>
+    <div id="stationListItems"></div>
+  </div>
+
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('loginModal')">&times;</button>
+      <h2>Login</h2>
+      <input type="text" id="loginUsername" placeholder="Username">
+      <input type="password" id="loginPassword" placeholder="Password">
+      <div class="error-message" id="loginError"></div>
+      <div class="modal-buttons">
+        <button onclick="login()">Login</button>
+        <button class="secondary" onclick="closeModal('loginModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Register Modal -->
+  <div class="modal" id="registerModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('registerModal')">&times;</button>
+      <h2>Register</h2>
+      <input type="text" id="registerUsername" placeholder="Username">
+      <input type="password" id="registerPassword" placeholder="Password (min 6 characters)">
+      <div class="error-message" id="registerError"></div>
+      <div class="modal-buttons">
+        <button onclick="register()">Register</button>
+        <button class="secondary" onclick="closeModal('registerModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Station Modal -->
+  <div class="modal" id="createStationModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('createStationModal')">&times;</button>
+      <h2>Create New Station</h2>
+      <label>Station Name *</label>
+      <input type="text" id="stationName" placeholder="My Awesome Radio">
+      <label>Description</label>
+      <textarea id="stationDescription" rows="3" placeholder="A brief description of your station..."></textarea>
+      <label>Genre</label>
+      <input type="text" id="stationGenre" placeholder="Pop, Rock, Classical, etc.">
+      <div id="stationLocation" style="color: #aaa; margin-top: 10px;"></div>
+      <div class="error-message" id="createStationError"></div>
+      <div class="modal-buttons">
+        <button onclick="createStation()">Create Station</button>
+        <button class="secondary" onclick="cancelStationCreation()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="/js/api.js"></script>
+  <script src="/js/auth.js"></script>
+  <script src="/js/map.js"></script>
+</body>
+</html>
