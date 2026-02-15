@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIPR Station Pins Demo</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #061304;
+      color: #e0e0e0;
+      padding: 40px;
+    }
+
+    h1 {
+      color: #934495;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h2 {
+      color: #2E8B3E;
+      margin: 30px 0 20px 0;
+    }
+
+    .demo-section {
+      background: #0d1f0b;
+      padding: 30px;
+      border-radius: 10px;
+      margin-bottom: 30px;
+      border: 1px solid #934495;
+    }
+
+    .pins-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 30px;
+      margin-top: 20px;
+    }
+
+    .pin-demo {
+      text-align: center;
+    }
+
+    .station-pin {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      margin: 10px auto;
+    }
+
+    .station-pin:hover {
+      animation: stationPulse 2s ease-in-out infinite;
+      transform: scale(1.1);
+    }
+
+    .station-abbr {
+      user-select: none;
+      text-align: center;
+    }
+
+    @keyframes stationPulse {
+      0%, 100% { 
+        box-shadow: 0 0 10px currentColor, 0 0 20px currentColor;
+      }
+      50% { 
+        box-shadow: 0 0 20px currentColor, 0 0 40px currentColor, 0 0 60px currentColor;
+      }
+    }
+
+    .pin-label {
+      margin-top: 10px;
+      font-size: 14px;
+    }
+
+    .color-info {
+      font-size: 12px;
+      color: #aaa;
+      margin-top: 5px;
+    }
+
+    .map-demo {
+      background: #061304;
+      height: 400px;
+      border-radius: 10px;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #2E8B3E;
+    }
+
+    .map-bg {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #061304 0%, #0d1f0b 50%, #061304 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+
+    .map-text {
+      color: #934495;
+      font-size: 24px;
+      margin-bottom: 20px;
+    }
+
+    .color-palette {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .color-swatch {
+      text-align: center;
+    }
+
+    .swatch {
+      width: 80px;
+      height: 80px;
+      border-radius: 10px;
+      margin-bottom: 10px;
+      border: 2px solid #934495;
+    }
+
+    .swatch-label {
+      font-size: 12px;
+    }
+
+    .code {
+      background: #061304;
+      padding: 15px;
+      border-radius: 5px;
+      border-left: 4px solid #2E8B3E;
+      margin-top: 15px;
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      color: #B5A642;
+      overflow-x: auto;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎙️ All India Public Radio - Custom Map Styling & Station Pins</h1>
+
+  <div class="demo-section">
+    <h2>Station Pin Color Combinations</h2>
+    <p style="margin-bottom: 20px;">Each station pin cycles through 4 color combinations based on station ID (id % 4). Hover over pins to see the pulse animation!</p>
+    
+    <div class="pins-grid">
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #2E8B3E; color: #D4A5C8; box-shadow: 0 0 10px #2E8B3E;">
+          <span class="station-abbr">MUM</span>
+        </div>
+        <div class="pin-label">Mumbai Radio</div>
+        <div class="color-info">Combo 1 (id % 4 === 0)</div>
+        <div class="color-info">Green #2E8B3E / Light Pink #D4A5C8</div>
+      </div>
+
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #B5A642; color: #8B2252; box-shadow: 0 0 10px #B5A642;">
+          <span class="station-abbr">DEL</span>
+        </div>
+        <div class="pin-label">Delhi Beats</div>
+        <div class="color-info">Combo 2 (id % 4 === 1)</div>
+        <div class="color-info">Gold #B5A642 / Dark Magenta #8B2252</div>
+      </div>
+
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #5B74D8; color: #B5A642; box-shadow: 0 0 10px #5B74D8;">
+          <span class="station-abbr">BLR</span>
+        </div>
+        <div class="pin-label">Bangalore FM</div>
+        <div class="color-info">Combo 3 (id % 4 === 2)</div>
+        <div class="color-info">Blue #5B74D8 / Gold #B5A642</div>
+      </div>
+
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #E07040; color: #934495; box-shadow: 0 0 10px #E07040;">
+          <span class="station-abbr">KOL</span>
+        </div>
+        <div class="pin-label">Kolkata Waves</div>
+        <div class="color-info">Combo 4 (id % 4 === 3)</div>
+        <div class="color-info">Coral #E07040 / Purple #934495</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Abbreviation Examples</h2>
+    <div class="pins-grid">
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #2E8B3E; color: #D4A5C8; box-shadow: 0 0 10px #2E8B3E;">
+          <span class="station-abbr">MMB</span>
+        </div>
+        <div class="pin-label">Mumbai Midnight Beats</div>
+        <div class="color-info">First letter of each word</div>
+      </div>
+
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #B5A642; color: #8B2252; box-shadow: 0 0 10px #B5A642;">
+          <span class="station-abbr">WAV</span>
+        </div>
+        <div class="pin-label">Wavelength</div>
+        <div class="color-info">Single word: first 3 letters</div>
+      </div>
+
+      <div class="pin-demo">
+        <div class="station-pin" style="background-color: #5B74D8; color: #B5A642; box-shadow: 0 0 10px #5B74D8;">
+          <span class="station-abbr">AIPR</span>
+        </div>
+        <div class="pin-label">All India Public Radio</div>
+        <div class="color-info">First letter, max 4 chars</div>
+      </div>
+    </div>
+
+    <pre class="code"><code>// Abbreviation generation logic:
+function generateAbbreviation(name) {
+  if (!name) return 'STN';
+  const words = name.trim().split(/\s+/);
+  if (words.length === 1) {
+    return words[0].substring(0, 3).toUpperCase(); // "Wavelength" → "WAV"
+  } else {
+    return words.slice(0, 4).map(word => word[0]).join('').toUpperCase(); // "Mumbai Midnight Beats" → "MMB"
+  }
+}</code></pre>
+  </div>
+
+  <div class="demo-section">
+    <h2>Map Visualization (Conceptual)</h2>
+    <p style="margin-bottom: 20px;">The map uses Stamen Toner tiles with CSS filters to achieve purple land and dark green water/borders.</p>
+    
+    <div class="map-demo">
+      <div class="map-bg">
+        <div class="map-text">🗺️ Map Container</div>
+        <p style="color: #e0e0e0; text-align: center; max-width: 600px; padding: 0 20px;">
+          Stamen Toner tiles recolored with CSS filters:<br/>
+          <code style="color: #B5A642;">filter: invert(100%) hue-rotate(200deg) saturate(150%) brightness(0.9);</code><br/>
+          <code style="color: #B5A642;">mix-blend-mode: screen;</code>
+        </p>
+      </div>
+    </div>
+
+    <pre class="code"><code>// Map initialization with Stamen Toner tiles:
+L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
+  attribution: '© Stamen Design, © Stadia Maps, © OpenStreetMap contributors',
+  maxZoom: 18,
+  className: 'stamen-toner-tiles'
+}).addTo(map);</code></pre>
+  </div>
+
+  <div class="demo-section">
+    <h2>Color Palette</h2>
+    <div class="color-palette">
+      <div class="color-swatch">
+        <div class="swatch" style="background: #061304;"></div>
+        <div class="swatch-label"><strong>Background</strong><br/>#061304<br/>Dark Green</div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch" style="background: #934495;"></div>
+        <div class="swatch-label"><strong>Primary</strong><br/>#934495<br/>Purple</div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch" style="background: #2E8B3E;"></div>
+        <div class="swatch-label"><strong>Accent 1</strong><br/>#2E8B3E<br/>Green</div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch" style="background: #B5A642;"></div>
+        <div class="swatch-label"><strong>Accent 2</strong><br/>#B5A642<br/>Gold</div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch" style="background: #5B74D8;"></div>
+        <div class="swatch-label"><strong>Accent 3</strong><br/>#5B74D8<br/>Blue</div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch" style="background: #E07040;"></div>
+        <div class="swatch-label"><strong>Accent 4</strong><br/>#E07040<br/>Coral</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h2>Features Implemented</h2>
+    <ul style="line-height: 2; color: #e0e0e0; margin-left: 20px;">
+      <li>✅ Stamen Toner tiles from Stadia Maps (replacing OpenStreetMap)</li>
+      <li>✅ CSS filters to recolor map: purple land (#934495), dark green water (#061304)</li>
+      <li>✅ Custom circular div icon markers with station abbreviations</li>
+      <li>✅ 4 color combinations cycling by station ID</li>
+      <li>✅ Automatic abbreviation generation (first letter of each word, max 4 chars)</li>
+      <li>✅ Pulsing glow animation on hover</li>
+      <li>✅ Full dark UI theme with AIPR brand colors</li>
+      <li>✅ Purple primary accent (#934495), green/gold/blue/coral secondary accents</li>
+      <li>✅ Dark green backgrounds (#061304, #0d1f0b) throughout</li>
+      <li>✅ Updated Leaflet attribution for Stamen/Stadia Maps/OpenStreetMap</li>
+    </ul>
+  </div>
+</body>
+</html>

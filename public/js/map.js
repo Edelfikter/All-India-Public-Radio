@@ -8,9 +8,10 @@ let newStationLatLng = null;
 function initMap() {
   map = L.map('map').setView([22.5, 78.5], 5); // Centered on India
 
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '© OpenStreetMap contributors',
-    maxZoom: 18
+  L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
+    attribution: '© <a href="https://stamen.com">Stamen Design</a>, © <a href="https://stadiamaps.com">Stadia Maps</a>, © <a href="https://openmaptiles.org">OpenMapTiles</a>, © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    maxZoom: 18,
+    className: 'stamen-toner-tiles'
   }).addTo(map);
 
   map.on('click', onMapClick);
@@ -27,6 +28,33 @@ async function loadStations() {
   }
 }
 
+// Generate station abbreviation from name
+function generateAbbreviation(name) {
+  if (!name) return 'STN';
+  
+  const words = name.trim().split(/\s+/);
+  
+  if (words.length === 1) {
+    // Single word: take first 2-3 letters
+    return words[0].substring(0, 3).toUpperCase();
+  } else {
+    // Multiple words: take first letter of each word, max 4
+    return words.slice(0, 4).map(word => word[0]).join('').toUpperCase();
+  }
+}
+
+// Get color combination based on station ID
+function getStationColors(stationId) {
+  const colorCombos = [
+    { bg: '#2E8B3E', text: '#D4A5C8' },  // Green bg, Light Pink text
+    { bg: '#B5A642', text: '#8B2252' },  // Gold bg, Dark Magenta text
+    { bg: '#5B74D8', text: '#B5A642' },  // Blue bg, Gold text
+    { bg: '#E07040', text: '#934495' }   // Coral bg, Purple text
+  ];
+  
+  return colorCombos[stationId % 4];
+}
+
 function displayStations() {
   // Clear existing markers
   markers.forEach(marker => map.removeLayer(marker));
@@ -34,7 +62,19 @@ function displayStations() {
 
   // Add markers for each station
   stations.forEach(station => {
-    const marker = L.marker([station.lat, station.lng])
+    const abbreviation = generateAbbreviation(station.name);
+    const colors = getStationColors(station.id);
+    
+    const divIcon = L.divIcon({
+      className: 'custom-station-marker',
+      html: `<div class="station-pin" style="background-color: ${colors.bg}; color: ${colors.text}; box-shadow: 0 0 10px ${colors.bg};">
+        <span class="station-abbr">${abbreviation}</span>
+      </div>`,
+      iconSize: [45, 45],
+      iconAnchor: [22.5, 22.5]
+    });
+    
+    const marker = L.marker([station.lat, station.lng], { icon: divIcon })
       .addTo(map)
       .bindPopup(createStationPopup(station));
     
