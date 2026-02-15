@@ -227,18 +227,16 @@
       </div>
     </div>
 
-    <div class="code">
-// Abbreviation generation logic:<br/>
-function generateAbbreviation(name) {<br/>
-  if (!name) return 'STN';<br/>
-  const words = name.trim().split(/\s+/);<br/>
-  if (words.length === 1) {<br/>
-    return words[0].substring(0, 3).toUpperCase(); // "Wavelength" → "WAV"<br/>
-  } else {<br/>
-    return words.slice(0, 4).map(word => word[0]).join('').toUpperCase(); // "Mumbai Midnight Beats" → "MMB"<br/>
-  }<br/>
-}
-    </div>
+    <pre class="code"><code>// Abbreviation generation logic:
+function generateAbbreviation(name) {
+  if (!name) return 'STN';
+  const words = name.trim().split(/\s+/);
+  if (words.length === 1) {
+    return words[0].substring(0, 3).toUpperCase(); // "Wavelength" → "WAV"
+  } else {
+    return words.slice(0, 4).map(word => word[0]).join('').toUpperCase(); // "Mumbai Midnight Beats" → "MMB"
+  }
+}</code></pre>
   </div>
 
   <div class="demo-section">
@@ -256,14 +254,12 @@ function generateAbbreviation(name) {<br/>
       </div>
     </div>
 
-    <div class="code">
-// Map initialization with Stamen Toner tiles:<br/>
-L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {<br/>
-  attribution: '© Stamen Design, © Stadia Maps, © OpenStreetMap contributors',<br/>
-  maxZoom: 18,<br/>
-  className: 'stamen-toner-tiles'<br/>
-}).addTo(map);
-    </div>
+    <pre class="code"><code>// Map initialization with Stamen Toner tiles:
+L.tileLayer('https://tiles.stadiamaps.com/tiles/stamen_toner/{z}/{x}/{y}{r}.png', {
+  attribution: '© Stamen Design, © Stadia Maps, © OpenStreetMap contributors',
+  maxZoom: 18,
+  className: 'stamen-toner-tiles'
+}).addTo(map);</code></pre>
   </div>
 
   <div class="demo-section">
